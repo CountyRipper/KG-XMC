@@ -61,4 +61,4 @@ def combine(pred_dir,reference_dir,model_name,data_dir,output_dir=None)-> List[L
         print('write into: '+output_dir)
         with open(output_dir,'w+')as w1:
             for row in pred_list:
-                w1.write(", ".join(row)+'\n')
+                w1.write(",".join(row)+'\n')
