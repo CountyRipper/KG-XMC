@@ -16,7 +16,7 @@ if __name__ == '__main__':
     
     parser.add_argument('-b', '--kg_batch_size', type=int, default=4,
                         help='number of batch size for training')
-    parser.add_argument('-e', '--kg_epoch', type=int, default=3,
+    parser.add_argument('-e', '--kg_epoch', type=int, default=4,
                         help='number of epochs to train (default: 100)')
     parser.add_argument('--kg_checkdir', type=str, default='bart_check',
                         help='path to trained model to save')
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     #rank part
     parser.add_argument('--is_rank_train',type=int,default=1)
-    parser.add_argument('--rank_model',type=str,default='sentence-transformers/all-MiniLM-L12-v2')
+    parser.add_argument('--rank_model',type=str,default='sentence-transformers/all-MiniLM-L6-v2')
     parser.add_argument('--rank_batch',type=int,default=64)
     parser.add_argument('--rank_epoch',type=int,default=3)
     parser.add_argument('--rankmodel_save',type=str,default='bi_rank')
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     #args.is_rank_train=0
     #args.is_rank=0
     # args.combine_model='bi-encoder'
-    # args.combine_model_name='all-MiniLM-L12-v2'
+    #args.combine_model_name='all-MiniLM-L6-v2'
     # args.modelname='bart'
     # args.outputmodel='bart_save'
     # args.batch_size=4

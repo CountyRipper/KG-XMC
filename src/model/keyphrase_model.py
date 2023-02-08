@@ -104,7 +104,7 @@ class KG_Model(pl.LightningModule):
                                    max_length=max_length, top_k=top_k, num_beams=num_beams)
     def train_dataloader(self):
         datadir = self.datadir
-        prefix = "summarize: "
+        prefix = "Summary: "
         #获取text, 获取label index，映射出label text
         train_texts = read_text(os.path.join(datadir,"X.trn.txt"))
         train_index = read_index(os.path.join(datadir,"Y.trn.txt"))
@@ -125,7 +125,7 @@ class KG_Model(pl.LightningModule):
         return train_data
     def val_dataloader(self):
         datadir = self.datadir
-        prefix = "summarize: "
+        prefix = "Summary: "
         #获取text, 获取label index，映射出label text
         val_texts = read_text(os.path.join(datadir,"X.trn.txt"))
         val_index = read_index(os.path.join(datadir,"Y.trn.txt"))
@@ -169,12 +169,12 @@ def kg_predict(model,src_dir,output_dir,data_size,model_type='bart'):
     dataloader = DataLoader(doc_list,batch_size=data_size)
     tokenizer = model.tokenizer
     
-    with open(output_dir,'a+') as t:
+    with open(output_dir,'w+') as t:
         for i in tqdm(dataloader): #range(len(data))
             tmp_result = get_predict(documents=i,tokenizer=tokenizer,model=model)
             for j in tmp_result:
                 l_labels = [] #l_label 是str转 label的集合
-                pre = j.replace("summarize: ","").strip().split(", ")
+                pre = j.replace("Summary: ","").strip().split(", ")
                 for k in range(len(pre)):
                     tmpstr = pre[k].strip(" ").strip("'").strip('"')
                     if tmpstr=='':continue

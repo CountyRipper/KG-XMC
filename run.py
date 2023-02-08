@@ -21,9 +21,8 @@ def run(args:ArgumentParser):
     #datadir = ['./dataset/wiki10-31k']
     # part 1 : check keyphrase args
     if args.is_kg_train:
-        model = kg_train(args)
-    else: 
-        model = KG_Model(args).load_from_checkpoint(os.path.join(args.datadir,args.kg_savedir))  
+        kg_train(args)  
+    model = KG_Model(args).load_from_checkpoint(os.path.join(args.datadir,args.kg_savedir))  
     if args.is_kg_pred:
         if not os.path.exists(os.path.join(args.datadir,'res')):
             os.mkdir(os.path.join(args.datadir,'res'))
