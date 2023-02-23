@@ -111,8 +111,8 @@ class modeltrainer(object):
         #from datasets import load_dataset
         #prefix = "summarize: "
         #dataset = load_dataset('json',data_files={'train': train_dir, 'valid': valid_dir}).shuffle(seed=42)
-        train_texts, train_labels = [prefix + each for each in train_dataset['document']], train_dataset['labels']
-        val_texts, valid_labels = [prefix + each for each in val_dataset['document']], val_dataset['labels']
+        #train_texts, train_labels = [prefix + each for each in train_dataset['document']], train_dataset['labels']
+        #val_texts, valid_labels = [prefix + each for each in val_dataset['document']], val_dataset['labels']
         train_dataset = self.__token_data(train_texts,train_labels)
         val_dataset = self.__token_data(val_texts,val_labels)
         if freeze_encoder:
@@ -179,30 +179,29 @@ class modeltrainer(object):
         data = []
         dic = [] # dictionary for save each model generate result
         src_value = [] # using for get source document which is used to feed into model, and get predicting result
+        data = read_text(src_dataname)
         res = []
         batch=[]
         # open test file 
-        with open(src_dataname, 'r+') as f:
-            for line in f:
-                data.append(json.loads(line)['document'])
-            # 进度条可视化 vision process
-            dataloader = DataLoader(data,batch_size= self.data_size)
-            f=open(output_dir,'w+')
-            f.close()
-            with open(output_dir,'a+') as t:
-                for i in tqdm(dataloader): #range(len(data))
-                    batch = i
-                    tmp_result = self.__predict(model,tokenizer,batch)
-                    for j in tmp_result:
-                        l_labels = [] #l_label 是str转 label的集合
-                        pre = j.strip('[]').strip().split(",")
-                        for k in range(len(pre)):
-                            tmpstr = pre[k].strip(" ").strip("'").strip('"')
-                            if tmpstr=='':continue
-                            l_labels.append(tmpstr)
-                        res.append(l_labels)
-                        t.write(", ".join(l_labels))
-                        t.write("\n")
+        
+        # 进度条可视化 vision process
+        dataloader = DataLoader(data,batch_size= self.data_size)
+        f=open(output_dir,'w+')
+        f.close()
+        with open(output_dir,'a+') as t:
+            for i in tqdm(dataloader): #range(len(data))
+                batch = i
+                tmp_result = self.__predict(model,tokenizer,batch)
+                for j in tmp_result:
+                    l_labels = [] #l_label 是str转 label的集合
+                    pre = j.strip('[]').strip().split(",")
+                    for k in range(len(pre)):
+                        tmpstr = pre[k].strip(" ").strip("'").strip('"')
+                        if tmpstr=='':continue
+                        l_labels.append(tmpstr)
+                    res.append(l_labels)
+                    t.write(", ".join(l_labels))
+                    t.write("\n")
         return res 
         
            

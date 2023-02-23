@@ -9,7 +9,7 @@ if __name__ == '__main__':
     parser.add_argument('--kg_type',type=str,default='bart')#bart,pega,t5
     parser.add_argument('--combine_type',type=str,default='bi')# bi, cr, del, sim
     parser.add_argument('--rank_type',type=str,default='bi')# bi,cr,sim
-    
+    parser.add_argument('--kg_sw',type=str,default='pl')# pl, hg
     # finetune args
     parser.add_argument('--is_kg_train',type=int,default=1,
                         help="whether run finteune processing")
@@ -47,7 +47,8 @@ if __name__ == '__main__':
     parser.add_argument('--rankmodel_save',type=str,default='bi_rank')
     parser.add_argument('--is_rank',type=int,default=1)
     args = parser.parse_args()
-    args.datadir = './dataset/amazoncat-13k/'
+    args.datadir = './dataset/wiki10-31k/'
+    args.kg_sw = 'hg'
     #args.is_kg_train=0
     #args.is_kg_pred = 0
     # args.is_kg_pred_trn=1

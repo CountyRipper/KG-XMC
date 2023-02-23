@@ -25,7 +25,7 @@ def run(args:ArgumentParser):
     # part 1 : check keyphrase args
     
     torch.cuda.empty_cache()
-    if args.datadir == './dataset/amazoncat-13k/':
+    if args.kg_sw == 'hg':
         trainer = modeltrainer(args)
         if args.is_kg_train:        
             trainer.train()
@@ -37,7 +37,7 @@ def run(args:ArgumentParser):
                                    output_dir=os.path.join(args.datadir,'res','trn_pred_'+args.kg_type+'.txt'))
             if args.is_kg_pred_tst:
                 trainer.predicting(args.kg_savedir,src_dataname=os.path.join(args.datadir,'X.tst.txt'),
-                                   output_dir=os.path.join(args.datadir,'res','tst_pred_'+args.kg_type+'.txt'))
+                                   output_dir=os.path.join(args.datadir,'res','tst_pred_'+args.kg_type+'.txt'))   
     else: 
         if args.is_kg_train:
             kg_train(args)  
