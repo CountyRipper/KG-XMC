@@ -5,7 +5,7 @@ functions: data processing, training, predicting
 import os
 from transformers import (BartTokenizerFast,PegasusTokenizerFast,BartForConditionalGeneration,
                           PegasusForConditionalGeneration,T5TokenizerFast,T5ForConditionalGeneration,
-                          AutoTokenizer,AutoModel)
+                          AutoTokenizer,AutoModel,BartTokenizer)
 import torch
 from torch.utils.data import DataLoader
 import wandb
@@ -46,7 +46,7 @@ class KG_Model(pl.LightningModule):
         self.curr_avg_loss = 0.0
         if 'bart'in self.type :
             self.model = BartForConditionalGeneration.from_pretrained(self.model_name).to(device)
-            self.tokenizer = BartTokenizerFast.from_pretrained(self.model_name)
+            self.tokenizer = BartTokenizer.from_pretrained(self.model_name)
         elif 'pega' in self.type :
             self.model =  PegasusForConditionalGeneration.from_pretrained(self.model_name).to(device)
             self.tokenizer = PegasusTokenizerFast.from_pretrained(self.model_name)
@@ -108,11 +108,15 @@ class KG_Model(pl.LightningModule):
         #获取text, 获取label index，映射出label text
         train_texts = read_text(os.path.join(datadir,"X.trn.txt"))
         train_index = read_index(os.path.join(datadir,"Y.trn.txt"))
+        #train_index = list(map(lambda x: x if len(x)<10 else x[0:10],train_index))
         label_map = load_map(os.path.join(datadir,"output-items.txt"))
         train_labels_list = transfer_indexs_to_labels(label_map,train_index) #list,需要转化成text
         train_labels = []
         for i in train_labels_list:
-            train_labels.append(prefix+", ".join(i))#是否加prefix
+            train_labels.append(", ".join(i))#是否加prefix
+        train_texts = list(map(lambda x: prefix+x,train_texts))
+        # for i in range(len(train_texts)):
+        #     train_texts[i] = prefix+train_texts[i]
         '''
         在这里加入shuffle或者sort,改变train_labels
         '''
@@ -127,13 +131,15 @@ class KG_Model(pl.LightningModule):
         datadir = self.datadir
         prefix = "Summary: "
         #获取text, 获取label index，映射出label text
-        val_texts = read_text(os.path.join(datadir,"X.trn.txt"))
-        val_index = read_index(os.path.join(datadir,"Y.trn.txt"))
+        val_texts = read_text(os.path.join(datadir,"X.tst.txt"))
+        val_index = read_index(os.path.join(datadir,"Y.tst.txt"))
+        #val_index = list(map(lambda x: x if len(x)<10 else x[0:10],val_index))
         label_map = load_map(os.path.join(datadir,"output-items.txt"))
         val_labels_list = transfer_indexs_to_labels(label_map,val_index) #list,需要转化成text
         val_labels = []
         for i in val_labels_list:
-            val_labels.append(prefix+",".join(i))#是否加prefix
+            val_labels.append(",".join(i))#是否加prefix
+        val_texts = list(map(lambda x: prefix+x,val_texts))
         '''
         在这里加入shuffle或者sort,改变train_labels
         '''

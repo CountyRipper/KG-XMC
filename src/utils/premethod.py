@@ -1,5 +1,9 @@
+import pickle
 from typing import List
+from sentence_transformers import SentenceTransformer, util
+import torch
 from src.utils.decorators import func_log
+from tqdm import tqdm
 @func_log
 def read_text(src)->List:
     res = []
@@ -118,3 +122,51 @@ def p_at_k(dir, src_label_dir,pred_label_dir,outputdir=None)->list:
                 w.write("p@5="+str(p5)+"\n")
                 #w.write(f"recall@100={recall_100:>4f}")
         return [p1,p3,p5]
+    
+def construct_rank_train(data_dir,model_name,label_map_dir,ground_index_dir,src_text_dir,output_index=None,output_label=None):
+    '''
+    调用untrained simces或者sentence-transformer排序所有的labels，然后选取前10/5个语义高度相关但是negetive的label作为负标签    
+    '''
+    print(f'label_map: {label_map_dir}')
+    print(f'ground_index_dir: {ground_index_dir}')
+    print(f'src_text_dir: {src_text_dir}')
+    label_map = load_map(label_map_dir)
+    ground_index = read_index(ground_index_dir)
+    src_text = read_text(src_text_dir)
+    with open(data_dir+'all_labels.pkl', "rb") as fIn:
+        stored_data = pickle.load(fIn)
+        #stored_sentences = stored_data['sentences']
+        embeddings_all = stored_data['embeddings']
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = SentenceTransformer(model_name_or_path=model_name,device=device)
+    #label_text_list = transfer_indexs_to_labels(label_map,ground_index)
+    embeddings_src = model.encode(src_text, convert_to_tensor=True,device=device)
+    cos_scores = util.cos_sim(embeddings_src,embeddings_all)
+    # scores = []
+    # for i in cos_scores:
+    #     scores.append([[ind, e] for ind, e in enumerate(i)])
+    # matrix each line is the socre of all labels for single text record
+    un_contain_list = []
+    res = []
+    for i in tqdm(range(len(cos_scores))):
+        count = 7 
+        '''调整为5可以减少negative num数量'''
+        tmp = []
+        flag = torch.zeros(len(embeddings_all),device=device)
+        while count>0:
+            this_score = torch.add(cos_scores[i],flag)
+            max_ind = torch.argmin(this_score).item()
+            if  max_ind not in ground_index[i]:
+                '''不在，说明是negative'''
+                tmp.append(max_ind)
+                count-=1
+            '''是ground，直接标记以下就可以了'''
+            flag[max_ind] = 2.0
+        un_contain_list.append(tmp)
+    for i in range(len(ground_index)):
+        ground_index[i].extend(un_contain_list[i])
+    if output_index:
+        with open(output_index,'w') as w:
+            for row in ground_index:
+                w.write(",".join(map(lambda x: str(x),row))+"\n")
+    return res
