@@ -47,10 +47,10 @@ if __name__ == '__main__':
     parser.add_argument('--rankmodel_save',type=str,default='bi_rank')
     parser.add_argument('--is_rank',type=int,default=1)
     args = parser.parse_args()
-    args.datadir = './dataset/wiki10-31k/'
-    args.kg_sw = 'hg'
+    #args.datadir = './dataset/wiki-500k/'
+    #args.kg_sw = 'hg'
     #args.is_kg_train=0
-    #args.is_kg_pred = 0
+    #args.is_kg_pred = []
     # args.is_kg_pred_trn=1
     # args.is_kg_pred_tst=1
     #args.is_combine=0
