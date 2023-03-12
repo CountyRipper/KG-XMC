@@ -42,6 +42,8 @@ class KG_Model(pl.LightningModule):
         #self.epoch = args.kg_epoch
         self.type= args.kg_type
         self.datadir = args.datadir
+        self.trn = args.kg_trn_data
+        self.tst = args.kg_tst_data
         #self.save_dir = args.kg_savedir
         self.curr_avg_loss = 0.0
         if 'bart'in self.type :
@@ -107,7 +109,7 @@ class KG_Model(pl.LightningModule):
         prefix = "Summary: "
         #获取text, 获取label index，映射出label text
         train_texts = read_text(os.path.join(datadir,"X.trn.txt"))
-        train_index = read_index(os.path.join(datadir,"Y.trn.txt"))
+        train_index = read_index(os.path.join(datadir,self.trn))
         #train_index = list(map(lambda x: x if len(x)<10 else x[0:10],train_index))
         label_map = load_map(os.path.join(datadir,"output-items.txt"))
         train_labels_list = transfer_indexs_to_labels(label_map,train_index) #list,需要转化成text
@@ -132,7 +134,7 @@ class KG_Model(pl.LightningModule):
         prefix = "Summary: "
         #获取text, 获取label index，映射出label text
         val_texts = read_text(os.path.join(datadir,"X.tst.txt"))
-        val_index = read_index(os.path.join(datadir,"Y.tst.txt"))
+        val_index = read_index(os.path.join(datadir,self.tst))
         #val_index = list(map(lambda x: x if len(x)<10 else x[0:10],val_index))
         label_map = load_map(os.path.join(datadir,"output-items.txt"))
         val_labels_list = transfer_indexs_to_labels(label_map,val_index) #list,需要转化成text

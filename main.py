@@ -26,6 +26,8 @@ if __name__ == '__main__':
                         help='learning rate')
     parser.add_argument('--kg_seed', type=int, default=44,
                         help='random seed (default: 1)')
+    parser.add_argument('--kg_trn_data', type=str, default='Y.trn.txt')
+    parser.add_argument('--kg_tst_data', type=str, default='Y.tst.txt')
     #perdicting args
     parser.add_argument('--is_kg_pred',type=int,default=1, help="whether predict")
     parser.add_argument('--is_kg_pred_trn',type=int,default=1,
