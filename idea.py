@@ -46,9 +46,7 @@ def sort_by_frequency(datadir):
     test_texts = read_text(os.path.join(datadir,"X.tst.txt"))
     train_index = read_index(os.path.join(datadir,"Y.trn.txt"))
     test_index = read_index(os.path.join(datadir,"Y.tst.txt"))
-    #train_index = list(map(lambda x: x if len(x)<10 else x[0:10],train_index))
     label_map = load_map(os.path.join(datadir,"output-items.txt"))
-    train_labels_list = transfer_indexs_to_labels(label_map,train_index) #list,需要转化成text
     index_freq_list = []
     train_texts.extend(test_texts)
     for i in tqdm(range(len(label_map))):

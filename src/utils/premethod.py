@@ -130,7 +130,6 @@ def construct_rank_train(data_dir,model_name,label_map_dir,ground_index_dir,src_
     print(f'label_map: {label_map_dir}')
     print(f'ground_index_dir: {ground_index_dir}')
     print(f'src_text_dir: {src_text_dir}')
-    label_map = load_map(label_map_dir)
     ground_index = read_index(ground_index_dir)
     src_text = read_text(src_text_dir)
     with open(data_dir+'all_labels.pkl', "rb") as fIn:
@@ -139,13 +138,8 @@ def construct_rank_train(data_dir,model_name,label_map_dir,ground_index_dir,src_
         embeddings_all = stored_data['embeddings']
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = SentenceTransformer(model_name_or_path=model_name,device=device)
-    #label_text_list = transfer_indexs_to_labels(label_map,ground_index)
     embeddings_src = model.encode(src_text, convert_to_tensor=True,device=device)
     cos_scores = util.cos_sim(embeddings_src,embeddings_all)
-    # scores = []
-    # for i in cos_scores:
-    #     scores.append([[ind, e] for ind, e in enumerate(i)])
-    # matrix each line is the socre of all labels for single text record
     un_contain_list = []
     res = []
     for i in tqdm(range(len(cos_scores))):
