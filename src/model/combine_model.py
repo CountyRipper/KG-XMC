@@ -57,8 +57,16 @@ def combine(pred_dir,reference_dir,model_name,data_dir,output_dir=None)-> List[L
             flag[max_ind] = -2.0
         for j in no_equal_list:
             pred_list[i][j['ind']] = j['label']
+    # replace duplicate
+    pre_new_list = []
+    for i in range(len(pred_list)):
+        tmp = []
+        for j in range(len(pred_list[i])):
+            if pred_list[i][j] not in tmp:
+                tmp.append(pred_list[i][j])
+        pre_new_list.append(tmp)
     if output_dir:
         print('write into: '+output_dir)
         with open(output_dir,'w+')as w1:
-            for row in pred_list:
+            for row in pre_new_list:
                 w1.write(",".join(row)+'\n')

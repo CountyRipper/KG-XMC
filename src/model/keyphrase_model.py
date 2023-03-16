@@ -4,7 +4,7 @@ functions: data processing, training, predicting
 '''
 import os
 from transformers import (BartTokenizerFast,PegasusTokenizerFast,BartForConditionalGeneration,
-                          PegasusForConditionalGeneration,T5TokenizerFast,T5ForConditionalGeneration,
+                          PegasusForConditionalGeneration,T5Tokenizer,T5TokenizerFast,T5ForConditionalGeneration,
                           AutoTokenizer,AutoModel,BartTokenizer)
 import torch
 from torch.utils.data import DataLoader

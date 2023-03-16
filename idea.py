@@ -25,6 +25,15 @@ datadir = './dataset/wiki10-31k/'
 #                      ground_index_dir=os.path.join(datadir,'Y.trn.txt'),
 #                      src_text_dir=os.path.join(datadir,'X.trn.txt'),output_index=os.path.join(datadir,'Y_com.trn.txt'))
 datadir = './dataset/wiki10-31k/'
+def sort_each_occur(datadir):
+    train_index = read_index(os.path.join(datadir,"Y.trn.txt"))
+    test_index = read_index(os.path.join(datadir,"Y.tst.txt"))
+    train_index = read_index(os.path.join(datadir,"Y.trn.txt"))
+    test_index = read_index(os.path.join(datadir,"Y.tst.txt"))
+    label_map = load_map(os.path.join(datadir,"output-items.txt"))
+    for i in range(len(train_index)):
+        
+    pass
 def sort_shuffle(datadir):
     train_index = read_index(os.path.join(datadir,"Y.trn.txt"))
     test_index = read_index(os.path.join(datadir,"Y.tst.txt"))
