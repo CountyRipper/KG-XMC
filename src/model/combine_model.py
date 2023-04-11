@@ -4,12 +4,30 @@ This model is used to combine or matching . It provides least 4 types: cross-enc
 import os
 import pickle
 import torch
+import math
+from torch.utils.data import DataLoader
 from typing import List
-from sentence_transformers import SentenceTransformer, util, CrossEncoder
+from sentence_transformers import SentenceTransformer, InputExample, losses,CrossEncoder,util
 from tqdm import tqdm
 from src.utils.premethod import load_map, read_label_text
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+def combine_train(model_name,model_save_dir,data_dir,num_epoch,batch_size):
+    label_list = load_map(os.path.join(data_dir,"output-items.txt"))
+    model = SentenceTransformer(model_name_or_path=model_name,device=device)
+    train_loss = losses.MultipleNegativesRankingLoss(model) 
+    train_data_un = [InputExample(texts=[i, i]) for m in label_list for i in m ]
+    #train_dataloader_un = DataLoader(fine_tune_unsup, shuffle=True, batch_size=batch_size)
+    train_dataloader = DataLoader(train_data_un, batch_size=batch_size, shuffle=True)
+    warmup_steps = math.ceil(len(train_dataloader) * num_epoch * 0.1) #10% of train data for warm-up
+    #   logger.info("Warmup-steps: {}".format(warmup_steps))
+    model.fit(train_objectives=[(train_dataloader, train_loss)],
+            epochs=num_epoch,
+            warmup_steps=warmup_steps,
+            #train_loss=train_loss,
+            #用curr
+            output_path=model_save_dir)
+    model.save(model_save_dir)
+    
 def combine(pred_dir,reference_dir,model_name,data_dir,output_dir=None)-> List[List[str]]:
     if not os.path.exists(pred_dir):
         print(f'{pred_dir} not exists, return. ')
