@@ -32,8 +32,7 @@ def sort_each_occur(datadir):
     test_index = read_index(os.path.join(datadir,"Y.tst.txt"))
     label_map = load_map(os.path.join(datadir,"output-items.txt"))
     for i in range(len(train_index)):
-        
-    pass
+        pass
 def sort_shuffle(datadir):
     train_index = read_index(os.path.join(datadir,"Y.trn.txt"))
     test_index = read_index(os.path.join(datadir,"Y.tst.txt"))
