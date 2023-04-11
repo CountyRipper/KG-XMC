@@ -56,7 +56,7 @@ def transfer_indexs_to_labels(label_map,index_lists)->List[List[str]]:
 
 def transfer_labels_to_index(label_map:List[str],label_texts)->List[List[str]]:
     index_list = []
-    for i in label_texts:
+    for i in tqdm(label_texts):
         cur_indexs = []
         for j in i:
             cur_indexs.append(label_map.index(j))
@@ -122,7 +122,65 @@ def p_at_k(dir, src_label_dir,pred_label_dir,outputdir=None)->list:
                 w.write("p@5="+str(p5)+"\n")
                 #w.write(f"recall@100={recall_100:>4f}")
         return [p1,p3,p5]
-    
+@func_log
+def p_at_k_text(dir, src_label_dir,pred_label_dir,outputdir=None)->list:
+    #src_label_dir = dir+src_label_dir
+    #pred_label_dir = os.path.join(dir,'res',pred_label_dir)
+    print("p_at_k:"+'\n')
+    print("src_label: "+src_label_dir)
+    print("pred_label: "+pred_label_dir)
+    p_at_1_count=0
+    p_at_3_count = 0
+    p_at_5_count = 0
+    src_label_list=[]
+    pred_label_list=[]
+    src_label_list = read_label_text(src_label_dir)
+    pred_label_list = read_label_text(pred_label_dir)
+    num1=len(src_label_list)
+    num2 = len(pred_label_list)
+    if num1!=num2:
+        print("num error")
+        return 
+    else:
+        #recall_100 = get_recall_100(src_label_list,pred_label_list)
+        for i in range(num1):
+            p1=0 
+            p3=0
+            p5=0
+            for j in range(len(pred_label_list[i])):
+                if pred_label_list[i][j] in src_label_list[i]:
+                    if j<1:
+                        p1+=1
+                        p3+=1
+                        p5+=1
+                    if j>=1 and j <3:
+                        p3+=1
+                        p5+=1
+                    if j>=3 and j<5:
+                        p5+=1
+            p_at_1_count+=p1
+            p_at_3_count+=p3
+            p_at_5_count+=p5
+        p1 = p_at_1_count/len(pred_label_list)
+        p3 = p_at_3_count/ (3*len(pred_label_list))
+        p5 = p_at_5_count/ (5*len(pred_label_list))
+        print('p@1= '+str(p1))
+        print('p@3= '+str(p3))
+        print('p@5= '+str(p5))
+        #print(f'recall@100 = {recall_100:>4f}')
+        if outputdir:
+            with open(outputdir,'a+')as w:
+                w.write("\n")
+                #now_time = datetime.datetime.now()
+                #time_str = now_time.strftime('%Y-%m-%d %H:%M:%S')
+                #w.write("time: "+time_str+"\n")
+                w.write("src_label: "+src_label_dir+"\n")
+                w.write('pred_label: '+ pred_label_dir+"\n")
+                w.write("p@1="+str(p1)+"\n")
+                w.write("p@3="+str(p3)+"\n")
+                w.write("p@5="+str(p5)+"\n")
+                #w.write(f"recall@100={recall_100:>4f}")
+        return [p1,p3,p5]    
 def construct_rank_train(data_dir,model_name,label_map_dir,ground_index_dir,src_text_dir,output_index=None,output_label=None):
     '''
     调用untrained simces或者sentence-transformer排序所有的labels，然后选取前10/5个语义高度相关但是negetive的label作为负标签    
