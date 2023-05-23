@@ -10,6 +10,7 @@ if __name__ == '__main__':
     parser.add_argument('--combine_type',type=str,default='bi')# bi, cr, del, sim
     parser.add_argument('--rank_type',type=str,default='bi')# bi,cr,sim
     parser.add_argument('--kg_sw',type=str,default='pl')# pl, hg
+    parser.add_argument('--len_max',type=int, default= 256) #''tokenizer max length of document.
     # finetune args
     parser.add_argument('--is_kg_train',type=int,default=1,
                         help="whether run finteune processing")

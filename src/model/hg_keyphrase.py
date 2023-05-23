@@ -40,6 +40,7 @@ class modeltrainer(object):
         self.output = self.datadir + args.kg_savedir
         self.batch_size = args.kg_batch_size
         self.epoch = args.kg_epoch
+        self.len_max = args.len_max
         #self.affix = args.affix1
         #self.top_k=args.top_k
         self.learning_rate = args.kg_lr
@@ -50,7 +51,7 @@ class modeltrainer(object):
             self.tokenizer = BartTokenizerFast.from_pretrained(pretrained_model_name_or_path="facebook/bart-large",cache_dir='./models')
         elif self.modelname=='facebook/bart-base' or self.modelname=='BART' or self.modelname=='Bart':
             self.model = BartForConditionalGeneration.from_pretrained("facebook/bart-base",cache_dir='./models').to(self.device)
-            self.tokenizer = BartTokenizer.from_pretrained(pretrained_model_name_or_path="facebook/bart-base",cache_dir='./models')
+            self.tokenizer = BartTokenizerFast.from_pretrained(pretrained_model_name_or_path="facebook/bart-base",cache_dir='./models')
         elif self.modelname=='pegasus' or self.modelname=='Pegasus' or self.modelname=='Pegasus-lrage'or self.modelname=='pegasus-large':
             self.model = PegasusForConditionalGeneration.from_pretrained('google/pegasus-large',cache_dir='./models').to(self.device)
             self.tokenizer = PegasusTokenizerFast.from_pretrained(pretrained_model_name_or_path="google/pegasus-large",cache_dir='./models')
@@ -68,8 +69,8 @@ class modeltrainer(object):
             self.model = AutoModelForSeq2SeqLM.from_pretrained("bloomberg/KeyBART",cache_dir='./models').to(self.device)
         #self.myData = MyData
     def __token_data(self,texts,labels):
-        encodings = self.tokenizer(texts, truncation=True, padding=True)
-        decodings = self.tokenizer(labels, truncation=True, padding=True)
+        encodings = self.tokenizer(texts, truncation=True, padding=True,model_max_length=self.len_max )
+        decodings = self.tokenizer(labels, truncation=True, padding=True, model_max_length=self.len_max)
         dataset_tokenized = MyData(encodings, decodings)
         return dataset_tokenized
     def __finetune(self,freeze_encoder=None):
@@ -157,7 +158,7 @@ class modeltrainer(object):
             w.write("endtime: "+end+"\n")
     
     def __predict(self,model,tokenizer,documents):
-        inputs = tokenizer(documents, return_tensors='pt', padding=True, truncation=True).to(self.device)
+        inputs = tokenizer(documents, return_tensors='pt', padding=True, truncation=True,model_max_length=self.len_max).to(self.device)
         #inputs = tokenizer(documents, return_tensors='pt', padding=True, truncation=True).to(device)#, padding=True
       # Generate Summary
         summary_ids = model.generate(inputs['input_ids'],max_length = 256,top_k=10,num_beams = 5).to(self.device)
