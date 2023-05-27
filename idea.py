@@ -85,4 +85,23 @@ def sort_semiantic(datadir):
     label_rank(src_labels=datadir+'Y_raw.trn.txt',src_text=datadir+'X.trn.txt',
            model_type='bi',model_name='sentence-transformers/all-MiniLM-L12-v2',label_map=datadir+'output-items.txt',
            output_text=None,output_index=datadir+'Y_rank.trn.txt')
+
+def is_raw_exist(datadir):
+    label_map = load_map(os.path.join(datadir,'output-items.txt'))
+    label_index_trn = read_index(os.path.join(datadir,'Y.trn.txt'))
+    label_index_tst = read_index(os.path.join(datadir,'Y.tst.txt'))
+    label_text_trn = transfer_indexs_to_labels(label_map,label_index_trn)
+    label_text_tst = transfer_indexs_to_labels(label_map,label_index_tst)
+    if not os.path.exists(os.path.join(datadir,'Y_raw.trn.txt')):
+        print('not trn_raw text')
+        with open(os.path.join(datadir,'Y_raw.trn.txt'),'w+') as w:
+            for i in label_text_trn:
+                w.write(",".join(i))
+                w.write('\n')
+    if not os.path.exists(os.path.join(datadir,'Y_raw.tst.txt')):
+        print('not trn_raw text')
+        with open(os.path.join(datadir,'Y_raw.tst.txt'),'w+') as w:
+            for i in label_text_tst:
+                w.write(",".join(i))
+                w.write('\n')            
     

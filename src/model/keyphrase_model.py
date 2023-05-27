@@ -44,6 +44,8 @@ class KG_Model(pl.LightningModule):
         self.datadir = args.datadir
         self.trn = args.kg_trn_data
         self.tst = args.kg_tst_data
+        self.top_k = args.top_k
+        self.top_p= args.top_p
         #self.save_dir = args.kg_savedir
         self.curr_avg_loss = 0.0
         if 'bart'in self.type :
@@ -58,6 +60,7 @@ class KG_Model(pl.LightningModule):
         else:
             self.model  = AutoModel.from_pretrained(self.model_name)
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+
         self.save_hyperparameters()
         # forward part
     def forward(self, encoder_input_ids, labels):
@@ -101,9 +104,9 @@ class KG_Model(pl.LightningModule):
             "interval": "step",
             "frequency": 1,
         }
-    def generate(self, input_ids, attention_mask, max_length, top_k, num_beams):
+    def generate(self, input_ids, attention_mask, max_length,num_beams):    
         return self.model.generate(input_ids=input_ids, attention_mask=attention_mask,
-                                   max_length=max_length, top_k=top_k, num_beams=num_beams)
+                                   max_length=max_length, top_k=self.top_k, num_beams=num_beams,top_p=self.top_p)
     def train_dataloader(self):
         datadir = self.datadir
         prefix = "Summary: "
@@ -153,13 +156,18 @@ class KG_Model(pl.LightningModule):
         # create a dataloader for your training data here
         return val_data
 
-def get_predict(documents,tokenizer,model):
+def get_predict(datadir,documents,tokenizer,model):
+    # constraint_list = load_map(os.path.join(datadir,'output-items.txt'))
+    # for i in constraint_list:
+    #     tokenizer.unique_no_split_tokens.append(i)
+    # Constraint = tokenizer(constraint_list,add_special_tokens=False).input_ids
     inputs = tokenizer(documents, return_tensors='pt', padding=True, truncation=True).to(device)
-    summary_ids = model.generate(inputs['input_ids'],inputs['attention_mask'], max_length = 256,top_k=10,num_beams = 5).to(device)
+    #print('constraint\n')
+    summary_ids = model.generate(inputs['input_ids'],inputs['attention_mask'], max_length = 256,num_beams = 3).to(device)
     pre_result=tokenizer.batch_decode(summary_ids,skip_special_tokens=True, clean_up_tokenization_spaces=True,pad_to_multiple_of=2)
     return pre_result
 
-def kg_predict(model,src_dir,output_dir,data_size,model_type='bart'):
+def kg_predict(model,datadir,src_dir,output_dir,data_size,model_type='bart'):
     '''
     model is the trained model of pretrained text2text model like BART.
     tokenizer is the tokenizer which is compaitible for model.
@@ -179,7 +187,7 @@ def kg_predict(model,src_dir,output_dir,data_size,model_type='bart'):
     
     with open(output_dir,'w+') as t:
         for i in tqdm(dataloader): #range(len(data))
-            tmp_result = get_predict(documents=i,tokenizer=tokenizer,model=model)
+            tmp_result = get_predict(datadir=datadir,documents=i,tokenizer=tokenizer,model=model)
             for j in tmp_result:
                 l_labels = [] #l_label 是str转 label的集合
                 pre = j.replace("Summary: ","").strip().split(", ")

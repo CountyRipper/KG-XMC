@@ -37,6 +37,7 @@ if __name__ == '__main__':
                         help="Whether run predicting testing dataset")
     parser.add_argument('--top_k',type=int,default=10)
     parser.add_argument('--data_size',type=int,default=12)
+    parser.add_argument('--top_p',type=float,default=0.75)
     #combine part
     parser.add_argument('--is_combine',type=int,default=1,
                         help="Whether run combine")
@@ -50,7 +51,7 @@ if __name__ == '__main__':
     parser.add_argument('--rankmodel_save',type=str,default='bi_rank')
     parser.add_argument('--is_rank',type=int,default=1)
     args = parser.parse_args()
-    #args.datadir = './dataset/wiki-500k/'
+    args.datadir = './dataset/wiki10-31k/'
     #args.kg_sw = 'hg'
     #args.is_kg_train=0
     #args.is_kg_pred = []

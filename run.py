@@ -46,10 +46,10 @@ def run(args:ArgumentParser):
             if not os.path.exists(os.path.join(args.datadir,'res')):
                 os.mkdir(os.path.join(args.datadir,'res'))
             if args.is_kg_pred_trn:
-                kg_predict(model,src_dir=os.path.join(args.datadir,'X.trn.txt'),
+                kg_predict(model,datadir=args.datadir,src_dir=os.path.join(args.datadir,'X.trn.txt'),
                        output_dir=os.path.join(args.datadir,'res','trn_pred_'+args.kg_type+'.txt'),data_size=8)
             if args.is_kg_pred_tst:
-                kg_predict(model,src_dir=os.path.join(args.datadir,'X.tst.txt'),
+                kg_predict(model,datadir=args.datadir,src_dir=os.path.join(args.datadir,'X.tst.txt'),
                        output_dir=os.path.join(args.datadir,'res','tst_pred_'+args.kg_type+'.txt'),data_size=8)
     # part 2: check combine args, combine
     if args.is_combine:
