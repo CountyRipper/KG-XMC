@@ -10,7 +10,7 @@ if __name__ == '__main__':
     parser.add_argument('--combine_type',type=str,default='bi')# bi, cr, del, sim
     parser.add_argument('--rank_type',type=str,default='bi')# bi,cr,sim
     parser.add_argument('--kg_sw',type=str,default='pl')# pl, hg
-    parser.add_argument('--len_max',type=int, default= 256) #''tokenizer max length of document.
+    parser.add_argument('--max_len',type=int,default=1024) #''tokenizer max length of document.
     # finetune args
     parser.add_argument('--is_kg_train',type=int,default=1,
                         help="whether run finteune processing")
@@ -51,12 +51,12 @@ if __name__ == '__main__':
     parser.add_argument('--rankmodel_save',type=str,default='bi_rank')
     parser.add_argument('--is_rank',type=int,default=1)
     args = parser.parse_args()
-    args.datadir = './dataset/wiki10-31k/'
+    #args.datadir = './dataset/wiki10-31k/'
     #args.kg_sw = 'hg'
     #args.is_kg_train=0
     #args.is_kg_pred = []
-    # args.is_kg_pred_trn=1
-    # args.is_kg_pred_tst=1
+    #args.is_kg_pred_trn=0
+    #args.is_kg_pred_tst=0
     #args.is_combine=0
     #args.is_rank_train=0
     #args.is_rank=0

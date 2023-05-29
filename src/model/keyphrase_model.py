@@ -5,7 +5,9 @@ functions: data processing, training, predicting
 import os
 from transformers import (BartTokenizerFast,PegasusTokenizerFast,BartForConditionalGeneration,
                           PegasusForConditionalGeneration,T5Tokenizer,T5TokenizerFast,T5ForConditionalGeneration,
-                          AutoTokenizer,AutoModel,BartTokenizer)
+                          AutoTokenizer,AutoModel,BartTokenizer,MBartForConditionalGeneration, MBart50TokenizerFast,
+                          GPT2Tokenizer, GPT2Model
+)
 import torch
 from torch.utils.data import DataLoader
 import wandb
@@ -45,18 +47,28 @@ class KG_Model(pl.LightningModule):
         self.trn = args.kg_trn_data
         self.tst = args.kg_tst_data
         self.top_k = args.top_k
-        self.top_p= args.top_p
+        self.top_p = None
+        if args.top_p:
+            self.top_p= args.top_p
+        if args.max_len:
+            self.max_len = args.max_len
         #self.save_dir = args.kg_savedir
         self.curr_avg_loss = 0.0
-        if 'bart'in self.type :
-            self.model = BartForConditionalGeneration.from_pretrained(self.model_name).to(device)
-            self.tokenizer = BartTokenizer.from_pretrained(self.model_name)
-        elif 'pega' in self.type :
+        if 'pega' in self.type :
             self.model =  PegasusForConditionalGeneration.from_pretrained(self.model_name).to(device)
-            self.tokenizer = PegasusTokenizerFast.from_pretrained(self.model_name)
+            self.tokenizer = PegasusTokenizerFast.from_pretrained(self.model_name,model_max_length = self.max_len)
+        elif 'mbart' in self.model_name:
+            self.model = MBartForConditionalGeneration.from_pretrained(self.model_name).to(device)
+            self.tokenizer = MBart50TokenizerFast.from_pretrained(self.model_name,model_max_length = self.max_len)
+        elif 'bart'in self.type :
+            self.model = BartForConditionalGeneration.from_pretrained(self.model_name).to(device)
+            self.tokenizer = BartTokenizerFast.from_pretrained(self.model_name,model_max_length = self.max_len)
         elif 't5' in self.type :
             self.model =  T5ForConditionalGeneration.from_pretrained(self.model_name).to(device)
-            self.tokenizer = T5TokenizerFast.from_pretrained(self.model_name)
+            self.tokenizer = T5TokenizerFast.from_pretrained(self.model_name,model_max_length = self.max_len)
+        elif 'gpt2' in self.model_name:
+            self.model = GPT2Model.from_pretrained(self.model_name)
+            self.tokenizer = GPT2Tokenizer.from_pretrained(self.model_name,model_max_length = self.max_len).to(device)
         else:
             self.model  = AutoModel.from_pretrained(self.model_name)
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
@@ -104,9 +116,13 @@ class KG_Model(pl.LightningModule):
             "interval": "step",
             "frequency": 1,
         }
-    def generate(self, input_ids, attention_mask, max_length,num_beams):    
-        return self.model.generate(input_ids=input_ids, attention_mask=attention_mask,
-                                   max_length=max_length, top_k=self.top_k, num_beams=num_beams,top_p=self.top_p)
+    def generate(self, input_ids, attention_mask, max_length,num_beams): 
+        if self.top_p and self.top_k:
+               return self.model.generate(input_ids=input_ids, attention_mask=attention_mask,
+                                   max_length=max_length, num_beams=num_beams,top_p=self.top_p)
+        else:
+            return self.model.generate(input_ids=input_ids, attention_mask=attention_mask,
+                                   max_length=max_length, num_beams=num_beams)
     def train_dataloader(self):
         datadir = self.datadir
         prefix = "Summary: "
@@ -125,6 +141,8 @@ class KG_Model(pl.LightningModule):
         '''
         在这里加入shuffle或者sort,改变train_labels
         '''
+        
+        encodings = self.tokenizer(train_texts, truncation=True, padding=True)
         encodings = self.tokenizer(train_texts, truncation=True, padding=True)
         decodings = self.tokenizer(train_labels, truncation=True, padding=True)
         dataset_tokenized = MyData(encodings, decodings)
@@ -149,6 +167,8 @@ class KG_Model(pl.LightningModule):
         在这里加入shuffle或者sort,改变train_labels
         '''
         encodings = self.tokenizer(val_texts, truncation=True, padding=True)
+
+        encodings = self.tokenizer(val_texts, truncation=True, padding=True)
         decodings = self.tokenizer(val_labels, truncation=True, padding=True)
         dataset_tokenized = MyData(encodings, decodings)
         val_data = DataLoader(
@@ -163,7 +183,7 @@ def get_predict(datadir,documents,tokenizer,model):
     # Constraint = tokenizer(constraint_list,add_special_tokens=False).input_ids
     inputs = tokenizer(documents, return_tensors='pt', padding=True, truncation=True).to(device)
     #print('constraint\n')
-    summary_ids = model.generate(inputs['input_ids'],inputs['attention_mask'], max_length = 256,num_beams = 3).to(device)
+    summary_ids = model.generate(inputs['input_ids'],inputs['attention_mask'], max_length = 128,num_beams = 5).to(device)
     pre_result=tokenizer.batch_decode(summary_ids,skip_special_tokens=True, clean_up_tokenization_spaces=True,pad_to_multiple_of=2)
     return pre_result
 
