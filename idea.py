@@ -105,3 +105,8 @@ def is_raw_exist(datadir):
                 w.write(",".join(i))
                 w.write('\n')            
     
+def long_tail(datadir):
+    '''
+    evaluation the performance of the long tail label
+    lang tail label: occur in doc only once or zero label
+    '''
