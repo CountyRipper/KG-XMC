@@ -3,9 +3,11 @@
 '''
 
 import os
+import secrets
 from src.model.rank_model import label_rank
 from src.utils.premethod import *
 from random import shuffle
+import random
 # ground_label_index = read_index(datadir+'Y.trn.txt')
 # label_map = load_map(datadir+'output-items.txt')
 # ground_label=transfer_indexs_to_labels(label_map,ground_label_index)
@@ -110,3 +112,44 @@ def long_tail(datadir):
     evaluation the performance of the long tail label
     lang tail label: occur in doc only once or zero label
     '''
+
+
+def random_sampling(datadir,src_dir ='Y_raw.trn.txt',sampling_count=5):
+    src_label = read_label_text(os.path.join(datadir,src_dir))
+    label_set = load_map(os.path.join(datadir,'output-items.txt'))
+    src_label = transfer_labels_to_index(label_set,src_label)
+    res=[]
+    for i in src_label:
+        count = sampling_count
+        tmp=[]
+        while count>0:
+            radom_num = random.randrange(len(label_set))
+            if radom_num not in i:
+                tmp.append(radom_num)
+                count-=1
+        res.append(i+tmp)
+    res = transfer_indexs_to_labels(label_set,res)
+    with open(os.path.join(datadir,'Y_random_sample.trn.txt'),'w+') as w:
+        for i in res:
+            w.write(",".join(i))
+            w.write('\n')
+    return res
+
+def extreme_sampling(datadir,src_dir ='Y.trn.txt',sampling_count=5):
+    src_label = read_index(os.path.join(datadir,src_dir))
+    label_set = load_map(os.path.join(datadir,'output-items.txt'))
+    res=[]
+    for i in src_label:
+        count = sampling_count
+        tmp=[]
+        while count>0:
+            radom_num = secrets.randbelow(len(label_set))
+            if radom_num not in i:
+                tmp.append(radom_num)
+                count-=1
+        res.append(i+tmp)
+    with open(os.path.join(datadir,'Y_ex_sample.trn.txt'),'w+') as w:
+        for i in res:
+            w.write(",".join(i))
+            w.write('\n')
+    return res     
