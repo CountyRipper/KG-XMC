@@ -62,7 +62,7 @@ class KG_Model(pl.LightningModule):
             self.tokenizer = MBart50TokenizerFast.from_pretrained(self.model_name,model_max_length = self.max_len)
         elif 'bart'in self.type :
             self.model = BartForConditionalGeneration.from_pretrained(self.model_name).to(device)
-            self.tokenizer = BartTokenizer.from_pretrained(self.model_name,model_max_length = self.max_len)
+            self.tokenizer = BartTokenizerFast.from_pretrained(self.model_name,model_max_length = self.max_len)
         elif 't5' in self.type :
             self.model =  T5ForConditionalGeneration.from_pretrained(self.model_name).to(device)
             self.tokenizer = T5TokenizerFast.from_pretrained(self.model_name,model_max_length = self.max_len)
@@ -70,6 +70,7 @@ class KG_Model(pl.LightningModule):
             self.model = GPT2Model.from_pretrained(self.model_name)
             self.tokenizer = GPT2Tokenizer.from_pretrained(self.model_name,model_max_length = self.max_len).to(device)
         else:
+            print('未识别model')
             self.model  = AutoModel.from_pretrained(self.model_name)
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
 

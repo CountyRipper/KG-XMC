@@ -71,11 +71,11 @@ def sort_by_frequency(datadir):
     for i in range(len(test_index)):
         list.sort(test_index[i],key= lambda x:com_list[x][1])
 
-    with open(datadir+"Y_freq.trn.txt",'w+') as w1:
+    with open(datadir+"/Y_freq.trn.txt",'w+') as w1:
         for i in train_index:
             w1.write(",".join(list(map(lambda x: str(x),i))))
             w1.write('\n')
-    with open(datadir+"Y_freq.tst.txt",'w+') as w2:
+    with open(datadir+"/Y_freq.tst.txt",'w+') as w2:
         for i in test_index:
             w2.write(",".join(list(map(lambda x: str(x),i))))
             w2.write('\n')

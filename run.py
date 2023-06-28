@@ -3,6 +3,7 @@ this is the start script of whole system, including keyphrase generation, matchi
 '''
 
 from argparse import ArgumentParser
+import datetime
 import os
 
 import torch
@@ -23,7 +24,7 @@ def run(args:ArgumentParser):
     model_time7=None
     #datadir = ['./dataset/wiki10-31k']
     # part 1 : check keyphrase args
-    
+    print(args)
     torch.cuda.empty_cache()
     if args.kg_sw == 'hg':
         trainer = modeltrainer(args)
@@ -76,8 +77,22 @@ def run(args:ArgumentParser):
                    model_type=args.rank_type,model_name=rank_model_save_dir,label_map=os.path.join(args.datadir,'output-items.txt'),
                    output_text=output_text,output_index=output_index)
     res_output_dir = os.path.join(args.datadir,'res_'+args.kg_type+args.combine_type+args.rank_type+'.txt')
-    print(args)
-    p_at_k(args.datadir,
+    if not os.path.exists(os.path.join(args.datadir,'logs.txt')):
+        with open(os.path.join(args.datadir,'logs.txt'),'w+') as w:
+            w.write('start:\n')
+    else:
+        with open(os.path.join(args.datadir,'logs.txt'),'r') as r:
+            r.write(str(args))
+            r.write('\n')
+            r.write(datetime.now())
+            r.write('\n'+'\n')
+    res_list = p_at_k(args.datadir,
            src_label_dir=os.path.join(args.datadir,'Y.tst.txt'),
            pred_label_dir=output_index,outputdir=res_output_dir)
+    with open(os.path.join(args.datadir,'logs.txt'),'r') as r:
+        r.write('P@1:'+str(res_list[0])+'\n')
+        r.write('P@3:'+str(res_list[1])+'\n')
+        r.write('P@5:'+str(res_list[2])+'\n')
+        
+        
     

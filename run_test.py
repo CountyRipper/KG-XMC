@@ -9,7 +9,7 @@ from src.model.keyphrase_model import KG_Model, kg_predict, kg_train
 from src.utils.premethod import p_at_k
 from idea import random_sampling
 datadir = './dataset/wiki10-31k'
-rank_model = "all-MiniLM-L12-v2"
+rank_model = "all-mpnet-base-v2"
 kg_type='bart'
 combine_type='bi'
 random_sampling(datadir=datadir,src_dir='res/tst_combine_'+kg_type+combine_type+'.txt',sampling_count=5)
@@ -21,7 +21,7 @@ rank_train(data_dir=datadir,model_name=rank_model,
                    src_text=os.path.join(datadir,'X.trn.txt'),pred_dir=pred_sdir,
                    model_save_dir=rank_model_save_dir,batch_size=32,epochs=2)
 src_labels = os.path.join(datadir,'res','tst_combine_'+kg_type+combine_type+'.txt')
-rank_type = 'bi_random'
+rank_type = 'mp_random'
 output_text = os.path.join(datadir,'res','tst_rank_'+kg_type+combine_type+rank_type+'.txt')
 output_index = os.path.join(datadir,'res','tst_rank_index_'+kg_type+combine_type+rank_type+'.txt')
 label_rank(src_labels=src_labels,src_text=os.path.join(datadir,'X.tst.txt'),
