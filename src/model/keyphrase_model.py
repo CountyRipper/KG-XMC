@@ -67,8 +67,8 @@ class KG_Model(pl.LightningModule):
             self.model =  T5ForConditionalGeneration.from_pretrained(self.model_name).to(device)
             self.tokenizer = T5TokenizerFast.from_pretrained(self.model_name,model_max_length = self.max_len)
         elif 'gpt2' in self.model_name:
-            self.model = GPT2Model.from_pretrained(self.model_name)
-            self.tokenizer = GPT2Tokenizer.from_pretrained(self.model_name,model_max_length = self.max_len).to(device)
+            self.model = GPT2Model.from_pretrained(self.model_name).to(device)
+            self.tokenizer = GPT2Tokenizer.from_pretrained(self.model_name,model_max_length = self.max_len)
         else:
             print('未识别model')
             self.model  = AutoModel.from_pretrained(self.model_name)

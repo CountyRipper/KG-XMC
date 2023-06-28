@@ -3,7 +3,7 @@ this is the start script of whole system, including keyphrase generation, matchi
 '''
 
 from argparse import ArgumentParser
-import datetime
+from datetime import datetime
 import os
 
 import torch
@@ -13,7 +13,7 @@ from src.model.combine_model import combine
 from src.model.keyphrase_model import KG_Model, kg_predict, kg_train
 from src.utils.premethod import p_at_k
 
-
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 def run(args:ArgumentParser):
     model_time1=None
     model_time2=None
@@ -42,7 +42,7 @@ def run(args:ArgumentParser):
     else: 
         if args.is_kg_train:
             kg_train(args)  
-        model = KG_Model(args).load_from_checkpoint(os.path.join(args.datadir,args.kg_savedir))  
+        model = KG_Model(args).load_from_checkpoint(os.path.join(args.datadir,args.kg_savedir)).to(device)  
         if args.is_kg_pred:
             if not os.path.exists(os.path.join(args.datadir,'res')):
                 os.mkdir(os.path.join(args.datadir,'res'))
@@ -81,10 +81,10 @@ def run(args:ArgumentParser):
         with open(os.path.join(args.datadir,'logs.txt'),'w+') as w:
             w.write('start:\n')
     else:
-        with open(os.path.join(args.datadir,'logs.txt'),'r') as r:
+        with open(os.path.join(args.datadir,'logs.txt'),'a+') as r:
             r.write(str(args))
             r.write('\n')
-            r.write(datetime.now())
+            r.write(str(datetime.now()))
             r.write('\n'+'\n')
     res_list = p_at_k(args.datadir,
            src_label_dir=os.path.join(args.datadir,'Y.tst.txt'),

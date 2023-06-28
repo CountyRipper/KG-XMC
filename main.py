@@ -54,7 +54,7 @@ if __name__ == '__main__':
     #args.datadir = './dataset/wiki10-31k/'
     #args.kg_sw = 'hg'
     #args.is_kg_train=0
-    #args.is_kg_pred = []
+    #args.is_kg_pred = 
     #args.is_kg_pred_trn=0
     #args.is_kg_pred_tst=0
     #args.is_combine=0
