@@ -50,6 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('--rank_epoch',type=int,default=3)
     parser.add_argument('--rankmodel_save',type=str,default='bi_rank')
     parser.add_argument('--is_rank',type=int,default=1)
+    parser.add_argument('--is_p_at_k',type=int,default=1)
     args = parser.parse_args()
     #args.datadir = './dataset/wiki10-31k/'
     #args.kg_sw = 'hg'

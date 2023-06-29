@@ -153,5 +153,5 @@ def extreme_sampling(datadir,src_dir ='Y.trn.txt',sampling_count=5):
             w.write(",".join(i))
             w.write('\n')
     return res     
-is_raw_exist('./dataset/wiki-500k/')
-sort_semiantic('./dataset/wiki-500k/')
+is_raw_exist('./dataset/eurlex-4k/')
+sort_semiantic('./dataset/eurlex-4k/')

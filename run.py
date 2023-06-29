@@ -86,13 +86,14 @@ def run(args:ArgumentParser):
             r.write('\n')
             r.write(str(datetime.now()))
             r.write('\n'+'\n')
-    res_list = p_at_k(args.datadir,
-           src_label_dir=os.path.join(args.datadir,'Y.tst.txt'),
-           pred_label_dir=output_index,outputdir=res_output_dir)
-    with open(os.path.join(args.datadir,'logs.txt'),'a') as r:
-        r.write('P@1:'+str(res_list[0])+'\n')
-        r.write('P@3:'+str(res_list[1])+'\n')
-        r.write('P@5:'+str(res_list[2])+'\n')
+    if args.is_p_at_k:
+        res_list = p_at_k(args.datadir,
+            src_label_dir=os.path.join(args.datadir,'Y.tst.txt'),
+            pred_label_dir=output_index,outputdir=res_output_dir)
+        with open(os.path.join(args.datadir,'logs.txt'),'a') as r:
+            r.write('P@1:'+str(res_list[0])+'\n')
+            r.write('P@3:'+str(res_list[1])+'\n')
+            r.write('P@5:'+str(res_list[2])+'\n')
         
         
     
