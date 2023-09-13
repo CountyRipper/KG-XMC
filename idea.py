@@ -153,5 +153,65 @@ def extreme_sampling(datadir,src_dir ='Y.trn.txt',sampling_count=5):
             w.write(",".join(i))
             w.write('\n')
     return res     
-is_raw_exist('./dataset/eurlex-4k/')
-sort_semiantic('./dataset/eurlex-4k/')
+# is_raw_exist('./dataset/eurlex-4k/')
+# sort_semiantic('./dataset/eurlex-4k/')
+
+def filter_present(datadir,src_dir ='Y.trn.txt',pre_output_dir=None,abs_output_dir=None):
+    label_map = load_map(os.path.join(datadir,'output-items.txt'))
+    src_label = read_index(os.path.join(datadir,src_dir))
+    src_label_name = transfer_indexs_to_labels(label_map,src_label)
+    src_text = read_text(os.path.join(datadir,'X.trn.txt'))
+    pre_output_dir = os.path.join(datadir,pre_output_dir)
+    abs_output_dir = os.path.join(datadir,abs_output_dir)
+    present_list = []
+    absent_list = []
+    for i in tqdm(range(len(src_label_name))):
+        tmp_p=[]
+        tmp_a=[]
+        for j in src_label_name[i]:
+            if j in src_text[i]: # present add
+                tmp_p.append(j)
+            else: tmp_a.append(j) #absent add
+        if not tmp_a:
+            tmp_a=tmp_p.copy()
+        if not tmp_p:
+            tmp_p=tmp_a.copy()
+        present_list.append(tmp_p)
+        absent_list.append(tmp_a)
+        
+    present_list = transfer_labels_to_index(label_map,present_list)
+    absent_list = transfer_labels_to_index(label_map,absent_list)
+    if pre_output_dir:
+        print(f'output: {pre_output_dir}')
+        with open(pre_output_dir,'w') as w:
+            for row in present_list:
+                w.write(",".join(map(lambda x :str(x), row))+'\n')
+    if abs_output_dir:
+        print(f'output: {abs_output_dir}')
+        with open(abs_output_dir,'w') as w:
+            for row in absent_list:
+                w.write(",".join(map(lambda x :str(x), row))+'\n')            
+    return present_list,absent_list     
+            
+def merge_labels(datadir,merge1,merge2,output=None):
+    res = []
+    label_list1 = read_label_text(os.path.join(datadir,merge1))
+    label_list2 = read_label_text(os.path.join(datadir,merge2))
+    for i in range(len(label_list1)):
+        tmp = set()
+        for j in range(len(label_list1[i])):
+            tmp.add(label_list1[i][j])
+        #层外度长一致，一每行样样一
+        for j in range(len(label_list2[i])):
+            tmp.add(label_list2[i][j])
+        res.append(list(tmp))
+    if output:
+        with open(os.path.join(datadir,output),'w') as w:
+            for row in res:
+                w.write(",".join(map(lambda x: str(x), row))+'\n')
+    return res
+                    
+    
+    
+            
+        

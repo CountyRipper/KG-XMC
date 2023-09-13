@@ -80,12 +80,16 @@ def run(args:ArgumentParser):
     if not os.path.exists(os.path.join(args.datadir,'logs.txt')):
         with open(os.path.join(args.datadir,'logs.txt'),'w+') as w:
             w.write('start:\n')
+            r.write(str(args))
+            r.write('\n')
+            r.write(str(datetime.now()))
+            r.write('\n'+'\n')
     else:
         with open(os.path.join(args.datadir,'logs.txt'),'a+') as r:
             r.write(str(args))
             r.write('\n')
             r.write(str(datetime.now()))
-            r.write('\n'+'\n')
+            r.write('\n')
     if args.is_p_at_k:
         res_list = p_at_k(args.datadir,
             src_label_dir=os.path.join(args.datadir,'Y.tst.txt'),
@@ -94,6 +98,8 @@ def run(args:ArgumentParser):
             r.write('P@1:'+str(res_list[0])+'\n')
             r.write('P@3:'+str(res_list[1])+'\n')
             r.write('P@5:'+str(res_list[2])+'\n')
+            r.write('\n')
+
         
         
     
